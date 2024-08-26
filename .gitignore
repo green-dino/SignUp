@@ -1,0 +1,107 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+.env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+*.egg
+*.egg-info/
+dist/
+build/
+eggs/
+parts/
+var/
+*.log
+
+# Django specific
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.mo
+
+# Ignore the local settings file
+local_settings.py
+
+# Ignore media files
+media/
+
+# Ignore static files
+staticfiles/
+static/
+
+# Ignore the secret key file
+secret_key.txt
+
+# Ignore the database
+db.sqlite3
+
+# Ignore the virtual environment
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Ignore IDE specific files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore coverage reports
+htmlcov/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Ignore pytest cache
+.pytest_cache/
+
+# Ignore mypy cache
+.mypy_cache/
+
+# Ignore Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# Ignore local .env files
+.env
+.env.*
+
+# Ignore pipenv files
+Pipfile.lock
+
+# Ignore celery beat schedule file
+celerybeat-schedule
+
+# Ignore translations
+*.mo
+*.pot
+
+# Ignore node_modules
+node_modules/
+
+# Ignore yarn lock file
+yarn.lock
+
+# Ignore npm debug log
+npm-debug.log
