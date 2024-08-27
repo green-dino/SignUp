@@ -49,7 +49,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
-        // Function to validate end date is after start date
+        var updateEventForm = document.getElementById('updateEventForm');
+
         function validateEndDate() {
             var startDate = new Date(document.getElementById('start_date').value);
             var endDate = new Date(document.getElementById('end_date').value);
@@ -62,12 +63,21 @@
             }
         }
 
-        // Add event listener to form submission for validation
-        document.getElementById('updateEventForm').addEventListener('submit', function (event) {
+        updateEventForm.addEventListener('submit', function (event) {
             if (!validateEndDate()) {
-                event.preventDefault(); // Prevent form submission if validation fails
+                event.preventDefault();
             }
         });
+
+        function updateFormData(newData) {
+            document.getElementById('name').value = newData.name;
+            document.getElementById('start_date').value = newData.start_date;
+            document.getElementById('end_date').value = newData.end_date;
+            document.getElementById('priority').value = newData.priority;
+            document.getElementById('description').value = newData.description;
+            document.getElementById('location').value = newData.location;
+            document.getElementById('organizer').value = newData.organizer;
+        }
     </script>
 </body>
 </html>

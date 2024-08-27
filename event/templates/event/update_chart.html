@@ -24,8 +24,8 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var ctx = document.getElementById('eventChart').getContext('2d');
-            var data = {
+            // Initialize chart data
+            var chartData = {
                 labels: [{% for category, count in pending_counts.items %}'{{ category }}',{% endfor %}],
                 datasets: [{
                     label: 'Pending Events',
@@ -49,7 +49,9 @@
                     borderWidth: 1
                 }]
             };
-            var options = {
+
+            // Chart options
+            var chartOptions = {
                 responsive: true,
                 scales: {
                     y: {
@@ -57,15 +59,36 @@
                     }
                 }
             };
-            try {
-                var myChart = new Chart(ctx, {
+
+            // Global reference to the chart instance
+            var myChart;
+
+            // Render the chart
+            function renderChart() {
+                var ctx = document.getElementById('eventChart').getContext('2d');
+                if (myChart) {
+                    myChart.destroy();
+                }
+                myChart = new Chart(ctx, {
                     type: 'bar',
-                    data: data,
-                    options: options
+                    data: chartData,
+                    options: chartOptions
                 });
-            } catch (error) {
-                console.error('Error rendering chart:', error);
             }
+
+            // Call the render function
+            renderChart();
+
+            // Function to update the chart data
+            function updateChartData(newLabels, newData) {
+                myChart.data.labels = newLabels;
+                myChart.data.datasets[0].data = newData;
+                myChart.update();
+            }
+
+            // Example of updating the chart data
+            // This can be triggered by any event, such as a button click or an AJAX call
+            // updateChartData(['New Category 1', 'New Category 2'], [10, 20]);
         });
     </script>
 </body>

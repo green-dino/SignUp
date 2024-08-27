@@ -74,12 +74,30 @@ def category_events(request, category_id):
 
 def event_chart(request):
     categories = Category.objects.all().prefetch_related('events')
+    
     pending_counts = {
         category.name: category.upcoming_events_count()
         for category in categories
     }
+    
     event_durations = {
         category.name: category.total_event_duration()
         for category in categories
     }
-    return render(request, 'event/event_chart.html', {'pending_counts': pending_counts, 'event_durations': event_durations})
+    
+    total_events = {
+        category.name: category.events.count()
+        for category in categories
+    }
+    
+    average_duration = {
+        category.name: (category.total_event_duration() / category.events.count()) if category.events.count() > 0 else 0
+        for category in categories
+    }
+    
+    return render(request, 'event/event_chart.html', {
+        'pending_counts': pending_counts,
+        'event_durations': event_durations,
+        'total_events': total_events,
+        'average_duration': average_duration
+    })
