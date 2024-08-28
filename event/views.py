@@ -28,7 +28,7 @@ def create_event(request):
             return response
     else:
         form = EventForm()
-    return render(request, 'event/create_event.html', {'form': form})
+    return render(request, 'event/create_event_new.html', {'form': form})
 
 def update_event(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
