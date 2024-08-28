@@ -54,6 +54,7 @@ class Event(models.Model):
     location = models.CharField(max_length=255, default='', blank=True, verbose_name="Location")
     organizer = models.CharField(max_length=100, default='', blank=True, verbose_name="Organizer")
 
+
     def __str__(self):
         return self.name
 

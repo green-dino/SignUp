@@ -4,6 +4,8 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from .models import Category, Event
 from .forms import EventForm, CategoryForm
+from collections import defaultdict
+from django.core.paginator import Paginator
 
 def handle_form_submission(request, form, success_message, redirect_url):
     if form.is_valid():
@@ -91,13 +93,21 @@ def event_chart(request):
     }
     
     average_duration = {
-        category.name: (category.total_event_duration() / category.events.count()) if category.events.count() > 0 else 0
+        category.name: (category.total_event_duration().total_seconds() / category.events.count() / 3600) if category.events.count() > 0 else 0
         for category in categories
     }
     
+    max_duration = max(average_duration.values(), default=0)
+
+    paginator = Paginator(list(average_duration.items()), 10)  # Show 10 categories per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
     return render(request, 'event/event_chart.html', {
         'pending_counts': pending_counts,
         'event_durations': event_durations,
         'total_events': total_events,
-        'average_duration': average_duration
+        'average_duration': dict(page_obj.object_list),
+        'max_duration': max_duration,
+        'page_obj': page_obj,
     })

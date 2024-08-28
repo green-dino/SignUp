@@ -1,54 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Update Event</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
-</head>
-<body>
-    <div class="container mt-5">
-        <h2 class="text-center">Update Event</h2>
-        <br>
-        <form method="post" id="updateEventForm">
-            {% csrf_token %}
-            <div class="form-group">
-                <label for="name">Name:</label>
-                <input type="text" class="form-control" id="name" name="name" value="{{ event.name }}" required />
-            </div>
-            <div class="form-group">
-                <label for="start_date">Start Date:</label>
-                <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="{{ event.start_date|date:'Y-m-d\\TH:i' }}" required />
-            </div>
-            <div class="form-group">
-                <label for="end_date">End Date:</label>
-                <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="{{ event.end_date|date:'Y-m-d\\TH:i' }}" required />
-                <small id="end_date_error" class="form-text text-danger"></small>
-            </div>
-            <div class="form-group">
-                <label for="priority">Priority:</label>
-                <input type="number" class="form-control" id="priority" name="priority" value="{{ event.priority }}" required />
-            </div>
-            <div class="form-group">
-                <label for="description">Description:</label>
-                <textarea class="form-control" id="description" name="description" required>{{ event.description }}</textarea>
-            </div>
-            <div class="form-group">
-                <label for="location">Location:</label>
-                <input type="text" class="form-control" id="location" name="location" value="{{ event.location }}" required />
-            </div>
-            <div class="form-group">
-                <label for="organizer">Organizer:</label>
-                <input type="text" class="form-control" id="organizer" name="organizer" value="{{ event.organizer }}" required />
-            </div>
-            <button type="submit" class="btn btn-primary">Save Event</button>
-        </form>
-    </div>
+{% extends "base.html" %}
 
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-    <script>
+{% block title %}Update Event{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Update Event</h2>
+    <br>
+    <form method="post" id="updateEventForm">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="name">Name:</label>
+            <input type="text" class="form-control" id="name" name="name" value="{{ event.name }}" required />
+        </div>
+        <div class="form-group">
+            <label for="start_date">Start Date:</label>
+            <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="{{ event.start_date|date:'Y-m-d\\TH:i' }}" required />
+        </div>
+        <div class="form-group">
+            <label for="end_date">End Date:</label>
+            <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="{{ event.end_date|date:'Y-m-d\\TH:i' }}" required />
+            <small id="end_date_error" class="form-text text-danger"></small>
+        </div>
+        <div class="form-group">
+            <label for="priority">Priority:</label>
+            <input type="number" class="form-control" id="priority" name="priority" value="{{ event.priority }}" required />
+        </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea class="form-control" id="description" name="description" required>{{ event.description }}</textarea>
+        </div>
+        <div class="form-group">
+            <label for="location">Location:</label>
+            <input type="text" class="form-control" id="location" name="location" value="{{ event.location }}" required />
+        </div>
+        <div class="form-group">
+            <label for="organizer">Organizer:</label>
+            <input type="text" class="form-control" id="organizer" name="organizer" value="{{ event.organizer }}" required />
+        </div>
+        <button type="submit" class="btn btn-primary">Save Event</button>
+    </form>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
         var updateEventForm = document.getElementById('updateEventForm');
 
         function validateEndDate() {
@@ -78,6 +74,6 @@
             document.getElementById('location').value = newData.location;
             document.getElementById('organizer').value = newData.organizer;
         }
-    </script>
-</body>
-</html>
+    });
+</script>
+{% endblock %}
