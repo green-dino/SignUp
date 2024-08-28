@@ -1,8 +1,14 @@
 from django import forms
-from .models import Event, Category
 from django.core.exceptions import ValidationError
+from .models import Event, Category
 
 class EventForm(forms.ModelForm):
+    category = forms.ModelChoiceField(
+        queryset=Category.objects.all(),
+        empty_label="Select Category",
+        widget=forms.Select(attrs={'class': 'form-control'})
+    )
+
     class Meta:
         model = Event
         fields = [
@@ -50,15 +56,19 @@ class EventForm(forms.ModelForm):
 
     def clean_priority(self):
         priority = self.cleaned_data.get('priority')
-        if priority < 1 or priority > 5:
+        if priority is not None and (priority < 1 or priority > 5):
             raise ValidationError("Priority must be between 1 and 5")
         return priority
 
+    def clean_name(self):
+        name = self.cleaned_data.get('name')
+        if name and Event.objects.filter(name=name).exists():
+            raise ValidationError('An event with this name already exists.')
+        return name
+
     def clean(self):
         cleaned_data = super().clean()
-        name = cleaned_data.get('name')
-        if name and Event.objects.filter(name=name).exists():
-            self.add_error('name', 'An event with this name already exists.')
+        # Additional cross-field validation can be added here if needed
         return cleaned_data
 
 class CategoryForm(forms.ModelForm):
@@ -81,6 +91,6 @@ class CategoryForm(forms.ModelForm):
 
     def clean_name(self):
         name = self.cleaned_data.get('name')
-        if Category.objects.filter(name=name).exists():
+        if name and Category.objects.filter(name=name).exists():
             raise ValidationError("A category with this name already exists.")
         return name

@@ -1,88 +1,15 @@
 {% extends "base.html" %}
 
-{% block title %}Add Event{% endblock %}
+{% block title %}Create Event{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <h2 class="text-center">Add Event</h2>
-    <br>
-    <form method="post" action="{% url 'create_event' %}" onsubmit="return validateForm()">
+<div class="container">
+    <h1 class="mt-5 text-center">Create Event</h1>
+    <br />
+    <form method="post">
         {% csrf_token %}
-        <div class="form-group">
-            <label for="eventName">Event Name:</label>
-            <input type="text" class="form-control" id="eventName" name="name" placeholder="Enter event name" required>
-            <div class="invalid-feedback">Please enter a valid event name.</div>
-        </div>
-        <div class="form-group">
-            <label for="eventCategory">Category:</label>
-            <select class="form-control" id="eventCategory" name="category" required>
-                <option value="">Select category</option>
-                {% for category in categories %}
-                    <option value="{{ category.id }}">{{ category.name }}</option>
-                {% endfor %}
-            </select>
-            <div class="invalid-feedback">Please select a category.</div>
-        </div>
-        <div class="form-group">
-            <label for="startDate">Start Date:</label>
-            <input type="datetime-local" class="form-control" id="startDate" name="start_date" required>
-            <div class="invalid-feedback">Please enter a valid start date.</div>
-        </div>
-        <div class="form-group">
-            <label for="endDate">End Date:</label>
-            <input type="datetime-local" class="form-control" id="endDate" name="end_date" required>
-            <div class="invalid-feedback">Please enter a valid end date.</div>
-        </div>
-        <div class="form-group">
-            <label for="priority">Priority:</label>
-            <input type="number" class="form-control" id="priority" name="priority" min="1" value="1" required>
-            <div class="invalid-feedback">Please enter a valid priority.</div>
-        </div>
-        <div class="form-group">
-            <label for="description">Description:</label>
-            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-        </div>
-        <div class="form-group">
-            <label for="location">Location:</label>
-            <input type="text" class="form-control" id="location" name="location" placeholder="Enter event location">
-        </div>
-        <div class="form-group">
-            <label for="organizer">Organizer:</label>
-            <input type="text" class="form-control" id="organizer" name="organizer" placeholder="Enter event organizer">
-        </div>
-        <button type="submit" class="btn btn-primary">Submit</button>
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Create Event</button>
     </form>
 </div>
-{% endblock %}
-
-{% block scripts %}
-<script>
-    function validateForm() {
-        var startDate = document.getElementById("startDate").value;
-        var endDate = document.getElementById("endDate").value;
-
-        if (new Date(startDate) >= new Date(endDate)) {
-            alert("End date must be after the start date.");
-            return false;
-        }
-        return true;
-    }
-
-    // Bootstrap form validation
-    (function() {
-        'use strict';
-        window.addEventListener('load', function() {
-            var forms = document.getElementsByClassName('needs-validation');
-            Array.prototype.filter.call(forms, function(form) {
-                form.addEventListener('submit', function(event) {
-                    if (form.checkValidity() === false) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        }, false);
-    })();
-</script>
 {% endblock %}
