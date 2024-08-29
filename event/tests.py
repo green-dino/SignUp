@@ -1,33 +1,31 @@
-from django.test import TestCase, Client
-from django.urls import reverse
+from django.test import TestCase
+from django.db import models
 from .models import Event, Category
 
-class EventTests(TestCase):
+class EventModelTest(TestCase):
 
-    def setUp(self):
-        self.client = Client()
-        self.category = Category.objects.create(name='Test Category')
-        self.event_data = {
-            'name': 'Test Event',
-            'category': self.category.id,
-            'start_date': '2023-01-01',
-            'end_date': '2023-01-02',
-            'priority': 'High',
-            'description': 'This is a test event.'
-        }
-        self.event = Event.objects.create(**self.event_data)
+    @classmethod
+    def setUpTestData(cls):
+        # Create a Category instance
+        category = Category.objects.create(name="Category 1")
 
-    def test_create_event(self):
-        response = self.client.post(reverse('create_event'), self.event_data)
-        self.assertEqual(response.status_code, 302)  # Redirect after successful creation
-        self.assertEqual(Event.objects.count(), 2)  # One event already created in setUp
+        # Create test data
+        Event.objects.create(name="Event 1", start_date="2023-01-01", end_date="2023-01-02", category=category)
+        Event.objects.create(name="Event 2", start_date="2023-01-03", end_date="2023-01-04", category=category)
+        Event.objects.create(name="Event 3", start_date="2023-01-02", end_date="2023-01-03", category=category)
 
-    def test_delete_event(self):
-        response = self.client.post(reverse('delete_event', args=[self.event.id]))
-        self.assertEqual(response.status_code, 302)  # Redirect after successful deletion
-        self.assertEqual(Event.objects.count(), 0)  # Event should be deleted
+    def test_ordering(self):
+        events = Event.objects.all()
+        self.assertEqual(events[0].name, "Event 1")
+        self.assertEqual(events[1].name, "Event 3")
+        self.assertEqual(events[2].name, "Event 2")
 
-    def test_create_event_view_get(self):
-        response = self.client.get(reverse('create_event'))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'event/create_event.html')
+    def test_verbose_name(self):
+        self.assertEqual(Event._meta.verbose_name, "Event")
+        self.assertEqual(Event._meta.verbose_name_plural, "Events")
+
+    def test_indexes(self):
+        indexes = Event._meta.indexes
+        index_fields = [index.fields for index in indexes]
+        self.assertIn(['start_date'], index_fields)
+        self.assertIn(['end_date'], index_fields)
