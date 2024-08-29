@@ -32,7 +32,7 @@
                         Event has started
                     {% endif %}
                 </td>
-                <td>{{ event.priority }}</td>
+                <td>{{ event.get_priority_display }}</td>
                 <td>
                     <a href="{% url 'update_event' event.id %}" class="btn btn-primary btn-sm">Update</a> <!-- Button to update event -->
                     <form method="post" action="{% url 'delete_event' event.id %}" style="display: inline;">

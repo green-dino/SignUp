@@ -60,11 +60,11 @@ class EventForm(forms.ModelForm):
             raise ValidationError("Priority must be between 1 and 5")
         return priority
 
-    def clean_name(self):
-        name = self.cleaned_data.get('name')
-        if name and Event.objects.filter(name=name).exists():
-            raise ValidationError('An event with this name already exists.')
-        return name
+    # def clean_name(self):
+    #     name = self.cleaned_data.get('name')
+    #     if name and Event.objects.filter(name=name).exists():
+    #         raise ValidationError('An event with this name already exists.')
+    #     return name
 
     def clean(self):
         cleaned_data = super().clean()
