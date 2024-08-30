@@ -4,7 +4,6 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from .models import Category, Event
 from .forms import EventForm, CategoryForm
-from collections import defaultdict
 from django.core.paginator import Paginator
 
 def handle_form_submission(request, form, success_message, redirect_url):
@@ -43,6 +42,10 @@ def update_event(request, event_id):
         form = EventForm(instance=event)
     return render(request, 'event/update_event.html', {'form': form})
 
+def event_detail(request, event_id):
+    event = get_object_or_404(Event, id=event_id)
+    return render(request, 'event/event_detail.html', {'event': event})
+
 def category_list(request):
     categories = Category.objects.all().prefetch_related('events')
     return render(request, 'event/category_list.html', {'categories': categories})
@@ -59,7 +62,7 @@ def create_category(request):
 
 def delete_category(request, category_id):
     category = get_object_or_404(Category, pk=category_id)
-    if category.event_count() > 0:
+    if category.events.exists():
         messages.error(request, "You cannot delete this category as it contains events.")
     else:
         category.delete()
@@ -78,22 +81,22 @@ def event_chart(request):
     categories = Category.objects.all().prefetch_related('events')
     
     pending_counts = {
-        category.name: category.upcoming_events_count()
+        category: category.upcoming_events_count()
         for category in categories
     }
     
     event_durations = {
-        category.name: category.total_event_duration()
+        category: category.total_event_duration()
         for category in categories
     }
     
     total_events = {
-        category.name: category.events.count()
+        category: category.events.count()
         for category in categories
     }
     
     average_duration = {
-        category.name: (category.total_event_duration().total_seconds() / category.events.count() / 3600) if category.events.count() > 0 else 0
+        category: (category.total_event_duration().total_seconds() / category.events.count() / 3600) if category.events.count() > 0 else 0
         for category in categories
     }
     

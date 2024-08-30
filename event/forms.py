@@ -62,8 +62,12 @@ class EventForm(forms.ModelForm):
 
     def clean_name(self):
         name = self.cleaned_data.get('name')
-        if name and Event.objects.filter(name=name).exists():
-            raise ValidationError('An event with this name already exists.')
+        if name:
+            qs = Event.objects.filter(name=name)
+            if self.instance.pk:
+                qs = qs.exclude(pk=self.instance.pk)
+            if qs.exists():
+                raise ValidationError('An event with this name already exists.')
         return name
 
     def clean(self):
@@ -88,9 +92,3 @@ class CategoryForm(forms.ModelForm):
                 'unique': 'A category with this name already exists.',
             },
         }
-
-    def clean_name(self):
-        name = self.cleaned_data.get('name')
-        if name and Category.objects.filter(name=name).exists():
-            raise ValidationError("A category with this name already exists.")
-        return name

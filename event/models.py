@@ -2,10 +2,14 @@ from django.db import models
 from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils import timezone
-from django.db.models import Sum, F, ExpressionWrapper, DurationField
+from django.db.models import Sum, F, ExpressionWrapper, DurationField, Q
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name="Category Name")
+
+    class Meta:
+        ordering = ['name']
+        verbose_name_plural = "Categories"
 
     def __str__(self):
         return self.name
@@ -25,18 +29,40 @@ class Category(models.Model):
         )['total_duration']
 
     def upcoming_events_count(self):
-        return self.events.filter(start_date__gt=timezone.now()).count()
+        return self.events.upcoming().count()
 
     def ongoing_events_count(self):
-        now = timezone.now()
-        return self.events.filter(start_date__lte=now, end_date__gte=now).count()
+        return self.events.ongoing().count()
 
     def past_events_count(self):
-        return self.events.filter(end_date__lt=timezone.now()).count()
+        return self.events.past().count()
 
-    class Meta:
-        ordering = ['name']
-        verbose_name_plural = "Categories"
+
+class EventQuerySet(models.QuerySet):
+    def upcoming(self):
+        return self.filter(start_date__gt=timezone.now())
+
+    def ongoing(self):
+        now = timezone.now()
+        return self.filter(start_date__lte=now, end_date__gte=now)
+
+    def past(self):
+        return self.filter(end_date__lt=timezone.now())
+
+
+class EventManager(models.Manager):
+    def get_queryset(self):
+        return EventQuerySet(self.model, using=self._db)
+
+    def upcoming(self):
+        return self.get_queryset().upcoming()
+
+    def ongoing(self):
+        return self.get_queryset().ongoing()
+
+    def past(self):
+        return self.get_queryset().past()
+
 
 class Event(models.Model):
     PRIORITY_CHOICES = [
@@ -54,6 +80,17 @@ class Event(models.Model):
     location = models.CharField(max_length=255, default='', blank=True, verbose_name="Location")
     organizer = models.CharField(max_length=100, default='', blank=True, verbose_name="Organizer")
 
+    objects = EventManager()
+
+    class Meta:
+        ordering = ['start_date']
+        verbose_name = "Event"
+        verbose_name_plural = "Events"
+        indexes = [
+            models.Index(fields=['start_date']),
+            models.Index(fields=['end_date']),
+            models.Index(fields=['category', 'priority']),
+        ]
 
     def __str__(self):
         return self.name
@@ -91,12 +128,3 @@ class Event(models.Model):
 
     def event_summary(self):
         return f"{self.name} ({self.priority_label()}) - {self.formatted_start_date()} to {self.formatted_end_date()}"
-
-    class Meta:
-        ordering = ['start_date']
-        verbose_name = "Event"
-        verbose_name_plural = "Events"
-        indexes = [
-            models.Index(fields=['start_date']),
-            models.Index(fields=['end_date']),
-        ]

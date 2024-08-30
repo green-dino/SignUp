@@ -1,31 +1,69 @@
-from django.test import TestCase
-from django.db import models
+import pytest
+from django.urls import reverse
+from django.contrib.auth.models import User
 from .models import Event, Category
 
-class EventModelTest(TestCase):
+@pytest.mark.django_db
+def test_create_event(client):
+    category = Category.objects.create(name="Test Category")
+    url = reverse('create_event')
+    data = {
+        'name': 'Test Event',
+        'category': category.id,
+        'start_date': '2023-12-01T10:00',
+        'end_date': '2023-12-01T12:00',
+        'priority': 3,
+        'description': 'This is a test event.',
+        'location': 'Test Location',
+        'organizer': 'Test Organizer'
+    }
+    response = client.post(url, data)
+    assert response.status_code == 302  # Redirect after successful creation
+    assert Event.objects.filter(name='Test Event').exists()
 
-    @classmethod
-    def setUpTestData(cls):
-        # Create a Category instance
-        category = Category.objects.create(name="Category 1")
+@pytest.mark.django_db
+def test_update_event(client):
+    category = Category.objects.create(name="Test Category")
+    event = Event.objects.create(
+        name='Test Event',
+        category=category,
+        start_date='2023-12-01T10:00',
+        end_date='2023-12-01T12:00',
+        priority=3,
+        description='This is a test event.',
+        location='Test Location',
+        organizer='Test Organizer'
+    )
+    url = reverse('update_event', args=[event.id])
+    data = {
+        'name': 'Updated Test Event',
+        'category': category.id,
+        'start_date': '2023-12-01T10:00',
+        'end_date': '2023-12-01T12:00',
+        'priority': 3,
+        'description': 'This is an updated test event.',
+        'location': 'Updated Test Location',
+        'organizer': 'Updated Test Organizer'
+    }
+    response = client.post(url, data)
+    assert response.status_code == 302  # Redirect after successful update
+    event.refresh_from_db()
+    assert event.name == 'Updated Test Event'
 
-        # Create test data
-        Event.objects.create(name="Event 1", start_date="2023-01-01", end_date="2023-01-02", category=category)
-        Event.objects.create(name="Event 2", start_date="2023-01-03", end_date="2023-01-04", category=category)
-        Event.objects.create(name="Event 3", start_date="2023-01-02", end_date="2023-01-03", category=category)
-
-    def test_ordering(self):
-        events = Event.objects.all()
-        self.assertEqual(events[0].name, "Event 1")
-        self.assertEqual(events[1].name, "Event 3")
-        self.assertEqual(events[2].name, "Event 2")
-
-    def test_verbose_name(self):
-        self.assertEqual(Event._meta.verbose_name, "Event")
-        self.assertEqual(Event._meta.verbose_name_plural, "Events")
-
-    def test_indexes(self):
-        indexes = Event._meta.indexes
-        index_fields = [index.fields for index in indexes]
-        self.assertIn(['start_date'], index_fields)
-        self.assertIn(['end_date'], index_fields)
+@pytest.mark.django_db
+def test_delete_event(client):
+    category = Category.objects.create(name="Test Category")
+    event = Event.objects.create(
+        name='Test Event',
+        category=category,
+        start_date='2023-12-01T10:00',
+        end_date='2023-12-01T12:00',
+        priority=3,
+        description='This is a test event.',
+        location='Test Location',
+        organizer='Test Organizer'
+    )
+    url = reverse('delete_event', args=[event.id])
+    response = client.post(url)
+    assert response.status_code == 302  # Redirect after successful deletion
+    assert not Event.objects.filter(id=event.id).exists()
