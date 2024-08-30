@@ -5,6 +5,8 @@ from django.urls import reverse_lazy
 from .models import Category, Event
 from .forms import EventForm, CategoryForm
 from django.core.paginator import Paginator
+from django.http import JsonResponse
+from datetime import datetime
 
 def handle_form_submission(request, form, success_message, redirect_url):
     if form.is_valid():
@@ -24,9 +26,12 @@ def delete_event(request, event_id):
 def create_event(request):
     if request.method == 'POST':
         form = EventForm(request.POST)
-        response = handle_form_submission(request, form, "Event created successfully.", reverse_lazy('category_list'))
-        if response:
-            return response
+        if form.is_valid():
+            form.save()
+            return JsonResponse({'success': True})
+        else:
+            errors = [error for error in form.errors.values()]
+            return JsonResponse({'success': False, 'errors': errors})
     else:
         form = EventForm()
     return render(request, 'event/create_event.html', {'form': form})
@@ -70,11 +75,10 @@ def delete_category(request, category_id):
     return redirect(reverse_lazy('category_list'))
 
 def category_events(request, category_id):
-    category = get_object_or_404(Category, pk=category_id)
-    events = category.events.all()
+    category = get_object_or_404(Category, id=category_id)
+    events = Event.objects.filter(category=category)
     for event in events:
-        event.duration = event.event_duration()
-        event.status = 'Pending' if event.is_upcoming_event() else 'Completed' if event.is_past_event() else 'Ongoing'
+        event.time_left = event.start_date - timezone.now()
     return render(request, 'event/category_events.html', {'category': category, 'events': events})
 
 def event_chart(request):

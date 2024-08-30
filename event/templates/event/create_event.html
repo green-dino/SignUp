@@ -6,10 +6,66 @@
 <div class="container">
     <h1 class="mt-5 text-center">Create Event</h1>
     <br />
-    <form method="post">
+    <form method="post" id="createEventForm">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit" class="btn btn-primary">Create Event</button>
+        <div id="formErrors" class="alert alert-danger" style="display: none;"></div>
+        <button type="submit" class="btn btn-primary" id="submitButton">Create Event</button>
+        <div id="loadingIndicator" class="spinner-border text-primary" role="status" style="display: none;">
+            <span class="sr-only">Loading...</span>
+        </div>
     </form>
+    <div id="successMessage" class="alert alert-success mt-3" style="display: none;">
+        Event created successfully!
+    </div>
 </div>
+
+<script>
+document.getElementById('createEventForm').addEventListener('submit', function(event) {
+    event.preventDefault();
+    var form = this;
+    var formData = new FormData(form);
+    var submitButton = document.getElementById('submitButton');
+    var loadingIndicator = document.getElementById('loadingIndicator');
+    var formErrors = document.getElementById('formErrors');
+    var successMessage = document.getElementById('successMessage');
+
+    // Clear previous errors
+    formErrors.style.display = 'none';
+    formErrors.innerHTML = '';
+
+    // Show loading indicator
+    submitButton.style.display = 'none';
+    loadingIndicator.style.display = 'inline-block';
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            successMessage.style.display = 'block';
+            form.reset();
+        } else {
+            // Show form errors
+            formErrors.style.display = 'block';
+            formErrors.innerHTML = data.errors.join('<br>');
+        }
+    })
+    .catch(error => {
+        formErrors.style.display = 'block';
+        formErrors.innerHTML = 'An error occurred. Please try again.';
+    })
+    .finally(() => {
+        // Hide loading indicator
+        submitButton.style.display = 'inline-block';
+        loadingIndicator.style.display = 'none';
+    });
+});
+</script>
 {% endblock %}

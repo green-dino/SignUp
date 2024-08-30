@@ -4,12 +4,12 @@
 
 {% block content %}
 <div class="container">
-    <h1 class="mt-5 text-center">Pending Events by Category</h1>
+    <h1 class="mt-5 text-center">Event Statistics</h1>
     <br />
 
     <div class="row mb-4">
         <div class="col-md-6">
-            <h2>Pending Events Chart</h2>
+            <h2>Pending Events by Category</h2>
             <ul class="list-group">
                 {% for category, count in pending_counts.items %}
                     <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -60,6 +60,67 @@
                     </li>
                 {% endfor %}
             </ul>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>Event Status Breakdown</h2>
+            <ul class="list-group">
+                {% for status, count in event_status_counts.items %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ status }}
+                        <span class="badge badge-success badge-pill">{{ count }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>Event Priority Breakdown</h2>
+            <ul class="list-group">
+                {% for priority, count in event_priority_counts.items %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ priority }}
+                        <span class="badge badge-danger badge-pill">{{ count }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>Event Organizer Breakdown</h2>
+            <ul class="list-group">
+                {% for organizer, count in event_organizer_counts.items %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ organizer }}
+                        <span class="badge badge-info badge-pill">{{ count }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2>Event Location Breakdown</h2>
+            <ul class="list-group">
+                {% for location, count in event_location_counts.items %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        {{ location }}
+                        <span class="badge badge-primary badge-pill">{{ count }}</span>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
             <nav aria-label="Page navigation example">
                 <ul class="pagination">
                     {% if page_obj.has_previous %}

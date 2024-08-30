@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 
+{% load time_filters %}
+
 {% block title %}{{ category.name }} Events{% endblock %}
 
 {% block content %}
@@ -26,8 +28,8 @@
                 <td>{{ event.name }}</td>
                 <td>{{ event.start_date }}</td>
                 <td>
-                    {% if event.time_left > 0 %}
-                        {{ event.time_left.days }}d {{ event.time_left.hours }}h {{ event.time_left.minutes }}m {{ event.time_left.seconds }}s
+                    {% if event.time_left.total_seconds > 0 %}
+                        {{ event.time_left|format_timedelta }}
                     {% else %}
                         Event has started
                     {% endif %}
