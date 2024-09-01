@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block title %}Event Details{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">{{ event.name }}</h2>
+    <br>
+    <p><strong>Category:</strong> {{ event.category.name }}</p>
+    <p><strong>Start Date:</strong> {{ event.start_date }}</p>
+    <p><strong>End Date:</strong> {{ event.end_date }}</p>
+    <p><strong>Priority:</strong> {{ event.priority }}</p>
+    <p><strong>Description:</strong> {{ event.description }}</p>
+    <p><strong>Location:</strong> {{ event.location }}</p>
+    <p><strong>Organizer:</strong> {{ event.organizer }}</p>
+</div>
+{% endblock %}

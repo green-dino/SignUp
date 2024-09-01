@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}My Registrations{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">My Registrations</h2>
+    <br>
+    <ul class="list-group">
+        {% for registration in registrations %}
+            <li class="list-group-item">
+                <a href="{% url 'registration_detail' registration.id %}">{{ registration.event.name }}</a>
+                - Registered on {{ registration.registered_at }}
+            </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

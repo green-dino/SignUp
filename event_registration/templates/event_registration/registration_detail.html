@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Registration Details{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <h2 class="text-center">Registration Details</h2>
+    <br>
+    <p><strong>Event:</strong> {{ registration.event.name }}</p>
+    <p><strong>User:</strong> {{ registration.user.username }}</p>
+    <p><strong>Registered At:</strong> {{ registration.registered_at }}</p>
+    <p><strong>Status:</strong> {{ registration.get_status_display }}</p>
+    <p><strong>Updated At:</strong> {{ registration.updated_at }}</p>
+</div>
+{% endblock %}

@@ -1,25 +1,40 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.exceptions import ValidationError
+from django.utils import timezone
+from event.models import Event
 
 class Registration(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    STATUS_CHOICES = [
+        ('pending', 'Pending'),
+        ('confirmed', 'Confirmed'),
+        ('cancelled', 'Cancelled'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='registrations')
+    event = models.ForeignKey(Event, on_delete=models.CASCADE, related_name='registrations')
+    status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     registered_at = models.DateTimeField(auto_now_add=True)
-    payment_status = models.CharField(max_length=20, default='pending')
-    ticket_number = models.PositiveIntegerField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
+        unique_together = ('user', 'event')
+        ordering = ['-registered_at']
         verbose_name = "Registration"
         verbose_name_plural = "Registrations"
 
     def __str__(self):
-        return f"User: {self.user.username}, Event: {self.event.name}"
+        return f"{self.user.username} - {self.event.name}"
 
-    @property
-    def is_paid(self):
-        return self.payment_status == 'paid'
+    def clean(self):
+        if self.event.start_date < timezone.now():
+            raise ValidationError("Cannot register for past events")
 
-    @property
+    def is_confirmed(self):
+        return self.status == 'confirmed'
+
+    def is_cancelled(self):
+        return self.status == 'cancelled'
+
     def is_pending(self):
-        return self.payment_status == 'pending'
+        return self.status == 'pending'

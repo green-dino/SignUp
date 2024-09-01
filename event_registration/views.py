@@ -1,27 +1,36 @@
-from django.shortcuts import render, redirect
-from django.contrib.auth.decorators import login_required
+# event_registration/views.py
+
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
-from .forms import RegistrationForm
+from django.db import transaction
 from .models import Registration
+from .forms import RegistrationForm
+from event.models import Event
 
-@login_required
 def register_for_event(request, event_id):
-    event = Event.objects.get(pk=event_id)
-    
-    if event.is_past_event():
-        messages.error(request, "This event has already passed.")
-        return redirect('event_list')
-
+    event = get_object_or_404(Event, id=event_id)
     if request.method == 'POST':
         form = RegistrationForm(request.POST)
         if form.is_valid():
-            registration = form.save(commit=False)
-            registration.user = request.user
-            registration.event = event
-            registration.save()
-            messages.success(request, "You have successfully registered for the event!")
-            return redirect('event_detail', pk=event_id)
+            with transaction.atomic():
+                registration, created = Registration.objects.select_for_update().get_or_create(
+                    user=request.user,
+                    event=event,
+                    defaults={'status': 'pending'}
+                )
+                if created:
+                    messages.success(request, "You have successfully registered for the event.")
+                else:
+                    messages.info(request, "You are already registered for this event.")
+                return redirect('event_detail', event_id=event.id)
     else:
         form = RegistrationForm()
+    return render(request, 'event_registration/register_event.html', {'form': form, 'event': event})
 
-    return render(request, 'register.html', {'form': form, 'event': event})
+def registration_list(request):
+    registrations = Registration.objects.filter(user=request.user)
+    return render(request, 'event_registration/registration_list.html', {'registrations': registrations})
+
+def registration_detail(request, registration_id):
+    registration = get_object_or_404(Registration, id=registration_id)
+    return render(request, 'event_registration/registration_detail.html', {'registration': registration})
