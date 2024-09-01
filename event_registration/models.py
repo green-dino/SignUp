@@ -4,6 +4,19 @@ from django.core.exceptions import ValidationError
 from django.utils import timezone
 from event.models import Event
 
+class RegistrationManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().select_related('event', 'user')
+
+    def confirmed(self):
+        return self.get_queryset().filter(status='confirmed')
+
+    def cancelled(self):
+        return self.get_queryset().filter(status='cancelled')
+
+    def pending(self):
+        return self.get_queryset().filter(status='pending')
+
 class Registration(models.Model):
     STATUS_CHOICES = [
         ('pending', 'Pending'),
@@ -16,6 +29,8 @@ class Registration(models.Model):
     status = models.CharField(max_length=10, choices=STATUS_CHOICES, default='pending')
     registered_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    objects = RegistrationManager()
 
     class Meta:
         unique_together = ('user', 'event')
@@ -38,3 +53,7 @@ class Registration(models.Model):
 
     def is_pending(self):
         return self.status == 'pending'
+
+# Adding a method to fetch available events for registration
+def get_available_events():
+    return Event.objects.filter(start_date__gte=timezone.now())
