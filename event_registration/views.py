@@ -1,7 +1,6 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib import messages
 from django.db import transaction
-from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from .models import Registration, get_available_events
 from .forms import RegistrationForm
@@ -11,8 +10,11 @@ def available_events(request):
     events = get_available_events()
     return render(request, 'event_registration/available_events.html', {'events': events})
 
-@login_required
 def register_for_event(request, event_id):
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to be logged in to register for an event.")
+        return redirect('login')
+
     event = get_object_or_404(Event, id=event_id)
     if event.start_date < timezone.now():
         messages.error(request, "Cannot register for past events.")
@@ -36,12 +38,18 @@ def register_for_event(request, event_id):
         form = RegistrationForm()
     return render(request, 'event_registration/register_event.html', {'form': form, 'event': event})
 
-@login_required
 def registration_list(request):
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to be logged in to view your registrations.")
+        return redirect('login')
+
     registrations = Registration.objects.filter(user=request.user).select_related('event')
     return render(request, 'event_registration/registration_list.html', {'registrations': registrations})
 
-@login_required
 def registration_detail(request, registration_id):
+    if not request.user.is_authenticated:
+        messages.error(request, "You need to be logged in to view registration details.")
+        return redirect('login')
+
     registration = get_object_or_404(Registration.objects.select_related('event'), id=registration_id)
     return render(request, 'event_registration/registration_detail.html', {'registration': registration})
