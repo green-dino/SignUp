@@ -6,14 +6,15 @@ from .models import Registration, get_available_events
 from .forms import RegistrationForm
 from event.models import Event
 
+
 def available_events(request):
     events = get_available_events()
     return render(request, 'event_registration/available_events.html', {'events': events})
 
 def register_for_event(request, event_id):
-    if not request.user.is_authenticated:
-        messages.error(request, "You need to be logged in to register for an event.")
-        return redirect('login')
+#    if not request.user.is_authenticated:
+#        messages.error(request, "You need to be logged in to register for an event.")
+#        return redirect('login')
 
     event = get_object_or_404(Event, id=event_id)
     if event.start_date < timezone.now():
